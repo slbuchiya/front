@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.smartfit2">
+
+    <!-- ✅ REQUIRED for backend API calls -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Smartfit2">
+
+        <!-- 🔹 SplashActivity is now the launcher -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Smartfit2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 🔹 LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Smartfit2" />
+
+        <!-- 🔹 MainActivity (Dashboard + Bottom Navigation) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Smartfit2" />
+
+        <!-- 🔹 SignupActivity -->
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Smartfit2" />
+
+        <!-- 🔹 Fitness Goal -->
+        <activity
+            android:name=".FitnessGoalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Smartfit2" />
+
+        <!-- 🔹 Workout Activities -->
+        <activity android:name=".ChestActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+        <activity android:name=".AbsActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+        <activity android:name=".LegsActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+        <activity android:name=".ArmsActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+        <activity android:name=".BackActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+
+        <!-- 🔹 Diet Activities -->
+        <activity android:name=".MuscleGainDietActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+        <activity android:name=".WeightLossDietActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+        <activity android:name=".BalancedDietActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+
+        <!-- 🔹 Edit Profile -->
+        <activity android:name=".EditProfileActivity" android:exported="false" android:theme="@style/Theme.Smartfit2" />
+
+    </application>
+
+</manifest>

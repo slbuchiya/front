@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="#FFFFFF" android:state_checked="true"/>  <!-- Selected = White -->
+    <item android:color="#90CAF9"/>                               <!-- Unselected = Light Blue -->
+
+    <item android:color="#2563EB" android:state_checked="true" />
+    <item android:color="#9CA3AF" android:state_checked="false" />
+
+    <item android:color="#1565C0" android:state_checked="true"/>  <!-- Active blue -->
+    <item android:color="#9E9E9E" android:state_checked="false"/> <!-- Inactive gray -->
+</selector>

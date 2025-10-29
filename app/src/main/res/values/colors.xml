@@ -1,0 +1,31 @@
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="off_white">#FAFBFE</color>      <!-- soft background -->
+    <color name="primary_blue_start">#3B82F6</color>
+    <color name="primary_blue_end">#2563EB</color>
+    <color name="text_primary">#0F1724</color>   <!-- very dark -->
+    <color name="text_secondary">#475569</color> <!-- muted -->
+    <color name="input_stroke">#E6EEF8</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="teal_200">#80CBC4</color>
+    <color name="bg_light">#FFFFFF</color>
+
+
+    <color name="black">#000000</color>
+    <color name="blue_dark">#1E3A8A</color> <!-- dark blue -->
+    <color name="black_bg">#000000</color>
+    <color name="blue_accent">#0A84FF</color>
+    <color name="gray_text">#B0B0B0</color>
+    <color name="card_light">#F5F5F5</color>
+
+
+   <color name="gray">#808080</color>
+
+    <!-- Accent / Highlight Colors -->
+    <color name="teal_700">#018786</color> <!-- Button color -->
+    <color name="light_gray">#F2F2F2</color> <!-- Card background / subtle bg -->
+     <color name="divider">#E0E0E0</color> <!-- For subtle lines -->
+
+    <!-- Optional Gradient Shades (for later use if needed) -->
+    <color name="blue_light">#4FC3F7</color>
+</resources>
