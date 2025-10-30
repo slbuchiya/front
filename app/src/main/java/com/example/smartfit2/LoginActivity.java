@@ -1,40 +1,32 @@
 package com.example.smartfit2;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONObject;
+// ખાતરી કરો કે આ import સાચા છે ('model' ફોલ્ડર વગર)
+import com.example.smartfit2.ApiService;
+import com.example.smartfit2.RetrofitClient;
+import com.example.smartfit2.UserResponse;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
-    ImageView ivToggle;
     Button btnLogin;
-    TextView tvSignUp;
-    boolean pwdVisible = false;
-
-    private static final String BASE_URL = "https://smartfit-backend-qwq8.onrender.com/api";
+    TextView tvRegisterNow; // tvSignup ને બદલે
+    ApiService apiService; // API સર્વિસ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,142 +35,63 @@ public class LoginActivity extends AppCompatActivity {
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        ivToggle = findViewById(R.id.ivToggle);
         btnLogin = findViewById(R.id.btnLogin);
-        tvSignUp = findViewById(R.id.tvSignUp);
+        tvRegisterNow = findViewById(R.id.tvSignUp); // XML માં tvSignup છે
+        // ------------------------------------
 
-        ivToggle.setOnClickListener(v -> {
-            pwdVisible = !pwdVisible;
-            if (pwdVisible) {
-                etPassword.setTransformationMethod(null);
-                ivToggle.setImageResource(R.drawable.ic_visibility_24);
-            } else {
-                etPassword.setTransformationMethod(new PasswordTransformationMethod());
-                ivToggle.setImageResource(R.drawable.ic_visibility_off_24);
-            }
-            etPassword.setSelection(etPassword.getText().length());
+        // Retrofit ક્લાયન્ટ
+        apiService = RetrofitClient.getClient().create(ApiService.class);
+
+        // રજીસ્ટર પેજ પર જવા માટે
+        tvRegisterNow.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
         });
 
+        // લોગિન બટન ક્લિક
         btnLogin.setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
-            String pass = etPassword.getText().toString().trim();
-
-            if (TextUtils.isEmpty(email)) {
-                etEmail.setError("Enter email");
-                return;
-            }
-            if (TextUtils.isEmpty(pass)) {
-                etPassword.setError("Enter password");
-                return;
-            }
-
-            sendLoginRequest(email, pass);
-        });
-
-        tvSignUp.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
-            startActivity(intent);
+            loginUser();
         });
     }
 
-    private void sendLoginRequest(String email, String password) {
-        OkHttpClient client = new OkHttpClient();
+    private void loginUser() {
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("email", email);
-            jsonObject.put("password", password);
-        } catch (Exception e) {
-            Toast.makeText(this, "Error preparing login data", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        RequestBody body = RequestBody.create(
-                jsonObject.toString(),
-                MediaType.parse("application/json; charset=utf-8")
-        );
+        // લોગિન રિક્વેસ્ટ ઑબ્જેક્ટ
+        ApiService.LoginRequest loginRequest = new ApiService.LoginRequest(email, password);
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/login")
-                .post(body)
-                .build();
-
-        Log.d("LOGIN_FLOW", "Sending login request...");
-
-        client.newCall(request).enqueue(new Callback() {
+        Call<UserResponse> call = apiService.loginUser(loginRequest);
+        call.enqueue(new Callback<UserResponse>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(LoginActivity.this, "Server connection failed", Toast.LENGTH_SHORT).show();
-                    Log.e("LOGIN_FLOW", "Login failed: " + e.getMessage());
-                });
-            }
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                // તમારા UserResponse.java મુજબ 'isSuccess()' ચેક કરો
+                if (response.isSuccessful() && response.body() != null) {
+                    // જો લોગિન સફળ થાય (તમારા બેકએન્ડ મુજબ 'message' અથવા 'success' ચેક કરો)
+                    // અહીં હું માની લઉં છું કે સફળ થવા પર સારો response code (200) આવે છે
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseData = response.body() != null ? response.body().string() : "";
-                Log.d("LOGIN_FLOW", "Response: " + responseData);
+                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
 
-                runOnUiThread(() -> {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-
-                        SharedPreferences sp = getSharedPreferences("user_prefs", MODE_PRIVATE);
-                        sp.edit().putString("user_email", email).apply();
-
-                        Log.d("LOGIN_FLOW", "Fetching name for email: " + email);
-                        fetchNameAndProceed(email);
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
-                        Log.e("LOGIN_FLOW", "Response not successful");
-                    }
-                });
-            }
-        });
-    }
-
-    private void fetchNameAndProceed(String email) {
-        OkHttpClient client = new OkHttpClient();
-        String url = BASE_URL + "/users?email=" + email;
-        Log.d("LOGIN_FLOW", "Fetching user details from: " + url);
-
-        Request request = new Request.Builder().url(url).get().build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e("LOGIN_FLOW", "Fetch name failed: " + e.getMessage());
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Failed to fetch user data", Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.body() == null) {
-                    Log.e("LOGIN_FLOW", "Response body null while fetching name");
-                    return;
+                    // લોગિન થયા પછી MainActivity પર જાઓ
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish(); // લોગિન એક્ટિવિટી બંધ કરો
+                } else {
+                    // જો રિસ્પોન્સમાં એરર હોય (દા.ત., 401 Unauthorized)
+                    Toast.makeText(LoginActivity.this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
+                    Log.e("LoginActivity", "API Error: " + response.code() + " " + response.message());
                 }
-                String res = response.body().string();
-                Log.d("LOGIN_FLOW", "User fetch response: " + res);
+            }
 
-                try {
-                    JSONObject user = new JSONObject(res);
-                    String fullName = user.getString("full_name");
-                    Log.d("LOGIN_FLOW", "Full name fetched: " + fullName);
-
-                    getSharedPreferences("user_prefs", MODE_PRIVATE)
-                            .edit()
-                            .putString("name", fullName)
-                            .apply();
-
-                    runOnUiThread(() -> {
-                        Log.d("LOGIN_FLOW", "Launching MainActivity now...");
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    });
-                } catch (Exception e) {
-                    Log.e("LOGIN_FLOW", "Error parsing user data: " + e);
-                }
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                // જો નેટવર્ક એરર હોય
+                Toast.makeText(LoginActivity.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("LoginActivity", "Network Failure: ", t);
             }
         });
     }
